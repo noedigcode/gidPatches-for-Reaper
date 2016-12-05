@@ -1,0 +1,142 @@
+desc:GVDK MIDI Patches
+//tags: MIDI processing split channel filter
+//author: Gideon van der Kolf
+
+
+//slider1:0<0,11,1{C,C#,D,D#,E,F,F#,G,G#,A,A#,B}>Key
+slider1:0<0,16,1>CurrentChannel
+
+@init 
+NOTE_OFF = 8;
+NOTE_ON = 9;
+CC = 11;
+PROG = 12;
+PBEND = 14;
+
+CC_status = $xB0;
+PBEND_status = $xE0;
+
+// 16x array for number of notes down per channel
+noteons=0;
+// 16x array for sustain per channel
+sustain=noteons+16;
+// 16x array for pbend per channel
+pbendarray=sustain+16;
+// 128x16 array for all notes per channel
+notes=pbendarray+16;
+// n-th note in c-th channel is accessed as: notes[c*128+n]
+
+// Initialise arrays
+i=0;
+loop(16,
+  sustain[i]=0;
+  pbendarray[i]=0;
+  j=0;
+  loop(128,
+    notes[i*128+j]=0;
+    j+=1;
+  );//end loop 128
+  i+=1;
+);//end loop 16
+
+@block
+while ( midirecv(ts,msg1,msg2,msg3) ) (
+  statusHi = (msg1/16)|0; // Status high bit (event type)
+  statusLo = (msg1-(statusHi*16))|0; // Status low bit (channel)
+  data2 = msg3;
+  data1 = msg2;
+  
+  (statusHi==PROG) ? (
+    (data1<16) ? (slider1=data1;);
+  );
+  
+  (statusHi==NOTE_ON) ? (
+    // Record in array
+    noteons[slider1] += 1;
+    notes[slider1*128+data1] = data2;
+  );
+  
+  ( (statusHi==NOTE_OFF) || ( (statusHi==NOTE_ON) && (data2==0) ) ) ? (
+  
+    // Remove from current array
+    (notes[slider1*128+data1]>0) ? (
+      noteons[slider1] -= 1;
+      notes[slider1*128+data1] = 0;
+    );
+    
+    // Loop through inactive channels
+    i=0;
+    loop(16,
+      (i!=slider1) ? (
+        (notes[i*128+data1]>0) ? (
+          notes[i*128+data1] = 0;
+          noteons[i] -= 1;
+          midisend(0,$x80+i,data1,0);
+          (noteons[i] == 0) ? (
+            // No more notes on for this channel.
+            // Zero sustain and pbend if still active
+            (sustain[i]>0) ? (
+              sustain[i]=0;
+              midisend(0,CC_status+i,64,0);
+            );//end sustain
+            (pbendarray[i]>0) ? (
+              pbendarray[i]=8192;
+              midisend(0,PBEND_status+i,0,64); // Pitchbend zero
+            );//end pbend
+          );//end noteons
+        );//end notes
+      );//end not slider1
+      i+=1;
+    );//end loop 16
+  
+  );//end noteoff and zero vel noteon
+  
+  ( (statusHi==CC) && (data1==64) ) ? (
+    // For current channel
+    sustain[slider1] = data2;
+    
+    // If zero, send to channels which still have sustain on
+    (data2==0) ? (
+      i=0;
+      loop(16,
+        (i!=slider1) ? (
+          (sustain[i]>0) ? (
+            sustain[i]=0;
+            // Send sustain off to channel
+            midisend(0,CC_status+i,64,0);
+          );//end sustain>0
+        );//end not slider1
+      i+=1;
+      );//end loop 16
+    );//end data2==0
+  );//end cc64
+  
+  (statusHi==PBEND) ? (
+    pbendarray[slider1] = data2*128+data1; // MSB*128 + LSB
+    
+    // If zero, sendd to channels which still have pbend on
+    ( (data2==64) && (data1==0) ) ? (
+      i=0;
+      loop(16,
+        (i!=slider1) ? (
+          (pbendarray[i]!=8192) ? (
+            pbendarray[i]=8192;
+            // Send pbend zero to channel
+            midisend(0,PBEND_status+i,0,64);
+          );
+        );
+        i+=1;
+      );
+    );
+  );
+    
+  // Finally, pass through the midi message to the current channel
+  // if not program
+  ( (statusHi==NOTE_ON) || (statusHi==NOTE_OFF) || (statusHi==CC) || (statusHi==PBEND) ) ? (
+    midisend(ts,(msg1&$xF0)+slider1,msg2,msg3);
+  );
+  
+    
+);//end while
+
+@sample
