@@ -11,4 +11,5 @@ Features:
  - Reaper tracks represent patches and are automatically detected by the GUI. Tracks can
    be ignored by starting the name with an underscore.
 
-An overview is available at https://noedigcode.github.io/gidPatches-for-Reaper/ (or in docs/index.html if you downloaded this).
+An overview is available at https://noedigcode.github.io/gidPatches-for-Reaper/
+(or in docs/index.html if you downloaded this)
