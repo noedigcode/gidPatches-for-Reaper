@@ -1,7 +1,7 @@
 <html>
 <body>
 
-<table width=80%>
+<table width=300px>
 <tr><td>
 <strong>gidPatches for Reaper</strong>
 <br>
@@ -9,11 +9,22 @@
 Switch patches for live keyboard playing using Reaper.
 <br>
 <br>
+gidPatches allows you to instantly switch between patches for live playing using MIDI program messages. Reaper tracks represent patches (but tracks starting with an underscore are ignored). A JSFX plugin on a main MIDI distribute track routes MIDI to channels based on the current patch. The patch tracks are automatically detected by a GUI Lua script which also automatically creates sends from the main distribute track to the patch tracks using the appropriate MIDI channels.
+<br>
+<br>
+The JSFX which does the MIDI routing ensures seamless patch switching. When notes, sustain pedal or pitchbend are held during a patch change, it is held until the user releases it. This ensures there are no sudden note-offs when changing patches and no stuck notes, sustain pedal or pitchbend.
+<br>
+<br>
 Below is an image describing the working of gidPatches.
 </tr></td>
 </table>
-
-<img src="images/gidPatches.svg">
-
+<br>
+  <img src="images/gidPatches.svg"></img>
+<br>
+<br>
+Download at <a href="https://github.com/noedigcode/gidPatches-for-Reaper">https://github.com/noedigcode/gidPatches-for-Reaper</a>
+<br>
+<br>
+  
 </body>
 </html>
