@@ -1,84 +1,44 @@
+<!DOCTYPE html>
 <html>
-<head>
+<title>gidPatches</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-
 :root{
-  --textwidth: 600px;
+  --headerbg: #c7ced8;
 }
-
-img {
-  max-width:100%;
-}
-
-body {
-  margin: 0;
-}
-
-#quote {
-  border: solid 2px;
-  border-radius: 3px;
-  border-color: grey;
-  width:300px;
-  margin-left: 50px;
-  background-color:#c7ced8;
-  padding: 10px;
-}
-
-#nicelink {
-  background: linear-gradient(135deg, #f1da36 0%,#fefcea 100%);
-  margin: 0px;
-  padding: 10px;
-}
-
-p {
-  width:var(--textwidth);
-  margin: 10px;
-}
-
-h1 {
-  font-size:24pt;
-  padding-top:40px;
-  padding-left:40px;
-  padding-bottom: 10px;
-  background-color:#c7ced8;
-  margin: 0px;
-}
-
-h2 {
-  font-size: 12pt;
-  font-weight: normal;
-  padding-left: 40px;
-  padding-bottom: 30px;
-  background-color:#c7ced8;
-  margin:0px;
-}
-
-h3 {
-  font-size: 16px;
-  margin: 10px;
-}
-
 </style>
-</head>
-<body>
 
+<link rel="stylesheet" href="css/w3.css">
+
+<div class="w3-container w3-padding-large" style="background-color:var(--headerbg)">
 <h1>gidPatches for Reaper</h1>
-<h2>Switch patches for live keyboard playing using Reaper.</h2>
-<p id="nicelink">Download at <a href="https://github.com/noedigcode/gidPatches-for-Reaper">https://github.com/noedigcode/gidPatches-for-Reaper</a></p>
-<br>
+<p>Switch patches for live keyboard playing using Reaper.</p>
+</div>
+
+<div class="w3-container" style="background: linear-gradient(135deg, #f1da36 0%,#fefcea 100%);">
+<p>
+Download at <a href="https://github.com/noedigcode/gidPatches-for-Reaper">https://github.com/noedigcode/gidPatches-for-Reaper</a>
+</p>
+</div>
+
+<div class="w3-container" style="max-width: 600px;">
+
 <p>
 gidPatches allows you to instantly switch between patches for live playing using MIDI program messages. Reaper tracks represent patches (but tracks starting with an underscore are ignored). A JSFX plugin on a main MIDI distribute track routes MIDI to channels based on the current patch. The patch tracks are automatically detected by a GUI Lua script which also automatically creates sends from the main distribute track to the patch tracks using the appropriate MIDI channels.
 </p>
+
 <p>
 The JSFX which does the MIDI routing ensures seamless patch switching. When notes, sustain pedal or pitchbend are held during a patch change, it is held until the user releases it. This ensures there are no sudden note-offs when changing patches and no stuck notes, sustain pedal or pitchbend.
 </p>
-<br>
+
 <p>
+<br>
 Below is an image that attempts to describe the working of gidPatches.
 </p>
-<img src="images/gidPatches.svg"></img>
-<br>
 
+</div>
 
-</body>
+<img src="images/gidPatches.svg" style="max-width:100%"></img>
+
 </html>
